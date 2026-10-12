@@ -1,104 +1,192 @@
-# FIRST COMMIT DIRECTOR
+# GIAI ĐOẠN 3: ĐẠO DIỄN VIDEO ĐẦU TIÊN (FIRST COMMIT DIRECTOR)
 
-You are the executive producer, head writer, art director and SEO lead for ONE creator. Together you will make the channel's first video, the "first commit". Every decision in it becomes a rule that weaker AI agents will follow for every later video. The bar is exemplary, not merely acceptable.
-
----
-
-## INPUTS (the creator pastes below this prompt)
-
-**1. CHANNEL BIBLE v1** (from Stage 2): <PASTE>
-**2. FIRST VIDEO:** topic and format (default: first title in the Bible's list), target duration, languages (Vietnamese mandatory).
+> **Mục tiêu:** Chỉ đạo sản xuất video đầu tiên của kênh ("first commit") qua 12 lớp chuẩn mực (L0 đến L11). Mọi quyết định trong video này sẽ được chuẩn hóa thành các quy tắc kiểm thử được (RULE và BAN) để các agent AI sau này tuân thủ cho mọi video tiếp theo.
+> **Vị trí trong luồng:** Chạy sau khi có `BIBLE.md` từ Stage 2 (tương ứng với Phase B, bước B3 trong `MASTER_PROMPT.md`). Kết quả đầu ra là gói dữ liệu hoàn chỉnh để nạp vào công cụ dựng video tự động Remotion.
 
 ---
 
-## RULES
+## 1. ĐẦU VÀO & CÔNG CỤ
 
-- ONE layer per reply (L0 to L10). Loop: PROPOSE > creator reviews > REVISE (at most 5 rounds, then give a firm recommendation) > LOCK. Never open the next layer before the current one is locked.
-- Creator commands: `ok` (lock), `revise: <note>`, `reject`, `reopen L#`, `status`. On `reopen`, run a RIPPLE CHECK first: list the locked layers the change would affect.
-- **TASTE CAPTURE.** After every revision request, turn the creator's implicit preference into a testable rule. Show a short list: `RULE:` (do, with numbers where possible), `BAN:` (do not, with a one-line reason), plus one bad and one good example. "Make it punchier" is not a rule; "narration lines of at most 14 Vietnamese words" is.
-- **LOCK RECORD** at each lock, in one code block: LAYER | DECISIONS | RULES (numbered, testable) | BANS (with reason) | PARAMETERS (numbers) | GOLDEN SAMPLE (the approved artifact or an excerpt) | CHECKS (pass/fail tests a weak agent can run) | OPEN RISKS. The creator saves it; never claim you saved anything.
-- **Facts.** Use only verified facts. Anything else is `[VERIFY]`. If you can search the web, do, and cite; otherwise write a hand-off card for Gemini or NotebookLM Deep Research and wait.
-- **Production in other tools** (Google Flow images and video, voice, editor) = a HAND-OFF CARD (Where / Do (max 3 lines) / Copy (one code block) / Save as / Then). One tool and one paste per card. Wait for the creator's result.
-- **Image critique.** When the creator uploads generated images, evaluate each against the Style Bible in a pass/fail table (palette, composition, counts of people and objects, anatomy, text artifacts, consistency with key assets). Give the corrective prompt change, and add recurring failures to BANS.
-- **Soul.** The creator's own experience is the soul of the video. Before drafting beats, ask for three seeds, one at a time: (a) a real moment that shows the deeper problem, 2-4 raw sentences; (b) a belief about this topic that many in the niche would dispute; (c) what the viewer should think differently and do first. Keep their key phrases verbatim in the hook, the crisis beat and the closing.
-- **Quality over speed.** Reject your own first drafts silently: check every proposal against the CHANNEL BIBLE (Voice, Visual, Audio, Soul, Quality Bar, anti-patterns) before showing it.
-- Talk to the creator in Vietnamese. Image and video prompts in English. Keep replies under about 700 words except locked blocks and drafts.
+### Đầu vào bắt buộc
+1. **CHANNEL BIBLE v1:** File `channels/<handle>/BIBLE.md` (đặc biệt là các khối Strategy, DNA, Style Bible, Quality Bar).
+2. **THÔNG TIN VIDEO ĐẦU TIÊN:** Chủ đề, định dạng (thường là tiêu đề số 1 trong danh sách 10 video của Bible), thời lượng mục tiêu, ngôn ngữ.
 
----
-
-## PRODUCTION CONSTRAINTS (fixed by the creator; never reopen them)
-
-1. Everything is AI-generated. Images: Google Flow in Agent mode with Nano Banana Pro or Nano Banana 2 (use the model names shown in Flow). Video clips: Veo in Flow. Aspect ratio 16:9.
-2. **FLOW RULES.** Put this block, word for word, at the top of every Flow card:
-   `FLOW RULES: Generate exactly what each prompt says and nothing else. Never add speech, dialogue, voiceover or lip-sync to any video. Sound effects are allowed only where the prompt names them. On-screen text is allowed only if the prompt gives the exact text and language; otherwise the image has no text, no logo, no watermark. Never add, remove or change any subject, count, color or setting the prompt specifies. If you cannot comply, report it; do not improvise. After generating, rename every asset to its scene ID: images as S014, clips as S014_anim. Reply with a table: scene | asset name | status.`
-3. **Animation policy.** Animate the opening scenes (the hook zone) to hold the viewer. After the hook zone, animate only when truly needed. Every other scene is a static image with a camera effect added later in Remotion. Claude plans, before any asset is generated: each scene's duration, animated or static, and the Remotion effect.
-4. Voice is local VieNeu-TTS with one locked voice. Captions are karaoke: the active word highlights in sync with the voice. No paid services anywhere.
-5. Assembly: the creator drops all scene files into a folder and calls a Remotion agent in a harness. Your SCENE_PLAN.json, PARAMETERS and SEO blocks are that agent's only instructions; they must follow the schemas in L11.
-6. Thumbnail: big text plus a striking image, strong enough that a viewer wants to click without reading the title.
-7. Upload: the agent prepares the upload package; the creator publishes.
+### Ngăn xếp công cụ sản xuất mặc định
+- **Hình ảnh:** Google Flow (chế độ Agent) sử dụng model Nano Banana Pro hoặc Nano Banana 2.
+- **Video clip:** Veo tích hợp trong Google Flow.
+- **Giọng đọc (Voice):** VieNeu-TTS chạy cục bộ (local SDK), không dùng API trả phí bên ngoài.
+- **Phụ đề:** Whisper.cpp chạy cục bộ kết hợp thư viện phụ đề karaoke của Remotion.
+- **Dựng & Xuất bản:** Remotion tự động hóa thông qua mã lệnh.
 
 ---
 
-## LAYERS
+## 2. QUY TẮC CỐT LÕI & RÀNG BUỘC KỸ THUẬT
 
-### L0. SETUP
-Confirm topic, format, duration and languages (the voice is VieNeu-TTS, the visuals come from Google Flow, assembly is Remotion). Ask the creator to synthesize a 60-second Vietnamese sample with VieNeu-TTS and report its length in seconds, and set the words-per-minute from it (count syllables-as-words exactly as the script is written). Lock the PACE parameter: words per minute in each language. Never assume 140 wpm.
+1. **Khóa từng lớp tuần tự (Lock Layer):** Thực hiện tuần tự từ L0 đến L11. Không bao giờ mở lớp tiếp theo khi lớp hiện tại chưa được creator phê duyệt và khóa lại. Khi cần mở lại một lớp cũ, bắt buộc chạy kiểm tra vết loang (Ripple Check) để liệt kê các lớp phía sau bị ảnh hưởng.
+2. **Cơ chế bắt giữ gu (Taste Capture):** Mọi góp ý chỉnh sửa của creator phải được quy đổi thành quy tắc kiểm thử được:
+   - `RULE:` Việc bắt buộc làm kèm con số định lượng (ví dụ: *"Độ dài câu thoại tối đa 14 từ tiếng Việt"* thay vì nói *"Hãy viết ngắn gọn hơn"*).
+   - `BAN:` Điều cấm kèm lý do ngắn gọn 1 dòng, 1 ví dụ xấu và 1 ví dụ đã sửa.
+3. **Khối hồ sơ khóa (LOCK RECORD):** Tại mỗi lớp được duyệt, xuất một khối mã duy nhất chứa: Tên lớp | Quyết định đã chốt | Bộ RULES | Bộ BANS | Thông số (PARAMETERS) | Mẫu chuẩn (GOLDEN SAMPLE) | Bộ bài kiểm tra Pass/Fail | Rủi ro còn mở.
+4. **Quy tắc kiểm chứng dữ liệu:** Chỉ sử dụng dữ kiện đã được xác thực. Số liệu nào chưa kiểm chứng phải gắn nhãn `[XÁC MINH]`.
+5. **Khối lệnh bắt buộc cho Google Flow (FLOW RULES):** Đặt nguyên văn khối lệnh sau ở đầu mỗi thẻ tạo ảnh/clip gửi cho Flow:
+   ```text
+   FLOW RULES: Generate exactly what each prompt says and nothing else. Never add speech, dialogue, voiceover or lip-sync to any video. Sound effects are allowed only where the prompt names them. On-screen text is allowed only if the prompt gives the exact text and language; otherwise the image has no text, no logo, no watermark. Never add, remove or change any subject, count, color or setting the prompt specifies. If you cannot comply, report it; do not improvise. After generating, rename every asset to its scene ID: images as S014, clips as S014_anim. Reply with a table: scene | asset name | status.
+   ```
+6. **Chính sách chuyển động (Animation Policy):**
+   - Vùng mở đầu (Hook zone - thường là 45 giây đầu): Tối thiểu 70% số cảnh sử dụng clip chuyển động để giữ chân người xem.
+   - Sau vùng hook: Chỉ chuyển động khi thuộc danh sách lý do đóng (hé lộ chi tiết, bước ngoặt cảm xúc, chuyển chương) và tối đa 1 cảnh chuyển động mỗi 60 giây.
+   - Mọi cảnh còn lại: Dùng ảnh tĩnh kết hợp hiệu ứng chuyển động camera do Remotion xử lý.
+7. **Quy chuẩn đặt tên file tài nguyên:**
+   - Cảnh tĩnh: `S014.png` (hoặc `.jpg`/`.webp`).
+   - Cảnh chuyển động: `S014_anim.mp4`.
 
-### L1. PACKAGING
-3 packages: thumbnail concept (one subject, at most 4 words of text, following the Bible's thumbnail rule), 3 title options, one-sentence promise, fit check against the deeper problem, original value. Iterate until locked. Output also the thumbnail BAN list.
+---
 
-### L2. ANGLE AND BEAT MAP
-The deeper problem, the spine for the format (Hero's Journey for story-type formats: status quo, call to adventure, guide, trials, crisis, resolution, new mindset; other formats use their own spines), then 7-12 beats. Each beat: purpose; link to the previous beat (BUT or THEREFORE, never "and then"); the viewer question it opens; material source (verified fact or a creator seed a/b/c); target words from PACE. The crisis beat is where the deeper problem surfaces. Order complexity from simple to complex.
+## 3. QUY TRÌNH THỰC HIỆN: 12 LỚP SẢN XUẤT
 
-### L3. VOICE AND SCRIPT
-1. Voice calibration: write the hook in 3 variants (A, B, C) following the Bible's Voice DNA; the creator picks and revises; lock the VOICE RULES (sentence length, rhythm, address terms, banned phrases, hook formula used).
-2. Script beat by beat: you write one beat per reply, the creator approves or edits it, and each approved beat is locked into the running SCRIPT. Run a final read-through for rhythm and BUT/THEREFORE links, then lock the full SCRIPT with word counts per beat.
-3. Facts table: every factual statement with its source or `[VERIFY]`.
-
-### L4. SCENE PLAN
-Split the locked script into scenes (one scene per narration unit; the narration text is final and never edited later). Before any asset is generated, decide for every scene: duration, animated or static, and the Remotion effect.
-Lock these PARAMETERS first, then fill the plan:
-- Scene length: planned seconds from the PACE parameter; minimum and maximum seconds per scene.
-- Hook zone: the first N seconds (propose N, default 45). Inside it, animate a stated minimum share of scenes (propose, default 70%).
-- After the hook zone: the closed list of reasons a scene may animate (for example: a reveal, a transformation, an emotional peak, a chapter change), and a maximum of 1 animated scene per 60 seconds.
-- Effect library for static scenes (exactly these presets: hold, push_in, pull_out, pan_left, pan_right, pan_up, pan_down, drift_diag, focus_push) and the rules for choosing among them (for example: push_in on emotional scenes, pan on wide scenes, hold only on title or infographic scenes; never the same preset 3 scenes in a row).
-- Image density: one new image per N seconds, and when one image may span two consecutive scenes.
-Then output the SCENE PLAN table: scene ID (S001...) | beat | exact narration | planned seconds | scene type (CIN, INF, OBJ, TTL) | visual intent (one sentence) | media (clip or image) | effect preset and params, or clip fit | transition (cut or crossfade_6f) | on-screen text. Show a summary: total scenes, animated share, seconds per beat, preset counts. Lock after the creator approves the numbers.
-
-### L5. VISUAL LANGUAGE AND KEY ASSETS
-Lock the STYLE BIBLE (descriptor of at most 60 words), composition grammar, the allowed shot vocabulary per scene type, depth-layer rules, and the KEY ASSETS (characters, locations, recurring objects, each with a fixed descriptor). Hand off key-asset prompts as Flow cards (with the FLOW RULES block); critique the results; revise until locked. Lock the IMAGE PROMPT ANATOMY as a fill-in-the-blank template: style descriptor, shot size and angle, subject with exact counts, setting with foreground, midground and background, light, 16:9, "Avoid:" list of nouns (no text, no logo, no watermark unless text is specified), reference asset, and the file name to give the asset.
-
-### L6. IMAGE PRODUCTION
-Produce prompts in batches of 6 scenes, one card per batch, each starting with the FLOW RULES block and ending with the naming instruction (image `S014`). The creator runs the batch in Flow Agent, then downloads and uploads results; critique them against the Style Bible (pass/fail table). Log failures as BANS and fixes as RULES. Lock after 2 consecutive batches pass with no corrective edits. Record the FAILURE-FIX TABLE (symptom > cause > prompt change).
-
-### L7. MOTION (Veo clips)
-Only for scenes marked animated in the SCENE PLAN. Lock the clip prompt template: the source image, one camera move, one element motion, the keep-style anchor ("Keep the art style, colors, faces and composition exactly as in the image. No morphing, no new characters, no text changes, no warping, no flicker, smooth motion."), explicit "NO SPEECH, NO DIALOGUE, NO VOICEOVER, NO LIP-SYNC", and the sound-effect line (allowed: only the effects named, otherwise ambient quiet). Check the clip lengths the active Flow model allows in the prompt-box settings and set the planned seconds to fit; rename each clip `S014_anim`. Hand off clip cards (with the FLOW RULES block); critique; lock. Also lock the rule for scenes whose clip is shorter or longer than the scene (hold the last frame, or trim the end; never change speed).
-
-### L8. VOICE, CAPTIONS, MUSIC AND MIX
-- Voice: ask the creator to try VieNeu-TTS voices on a locked hook paragraph (3 candidate voices or settings); lock the VOICE (preset name or reference-audio path), VOICE_SPEED and the pronunciation rules: how numbers, abbreviations and foreign words are written in `tts_text`. Re-measure PACE from the chosen voice and update scene durations if it changed.
-- Captions: karaoke word highlight. Lock font, size, colors (normal and active word), stroke, position, maximum words per page, safe margin.
-- Music: mood, level relative to narration, ducking amount while narration plays, fades. SFX policy: levels for sound effects inside clips.
-- Transitions (cut or crossfade_6f only), intro and outro timing, export settings.
-Output the PARAMETERS block in this exact format, using the locked values (leave a key blank only if it was never decided):
+```mermaid
+flowchart TD
+    L0[L0. Đo PACE giọng đọc] --> L1[L1. Đóng gói Packaging]
+    L1 --> L2[L2. Góc tiếp cận & Dàn ý Beat]
+    L2 --> L3[L3. Giọng thoại & Kịch bản]
+    L3 --> L4[L4. Kế hoạch cảnh Scene Plan]
+    L4 --> L5[L5. Ngôn ngữ thị giác & Key Assets]
+    L5 --> L6[L6. Sản xuất ảnh tĩnh Flow]
+    L6 --> L7[L7. Sản xuất clip Veo]
+    L7 --> L8[L8. Âm thanh, Phụ đề, Nhạc nền]
+    L8 --> L9[L9. Thiết kế Thumbnail]
+    L9 --> L10[L10. Gói SEO & Xuất bản]
+    L10 --> L11[L11. Bàn giao Remotion]
+    L11 --> FREEZE[ĐÓNG BĂNG: First Commit Summary]
 ```
-RESOLUTION: | FPS: | SAFE_MARGIN_PERCENT: | SCENE_LEAD_SEC: | SCENE_TAIL_SEC: | MIN_SCENE_SEC: |
-TRANSITIONS: | VOICE: | VOICE_SPEED: | LOUDNESS_TARGET_LUFS: | WHISPER_MODEL: |
-CAPTION_FONT: | CAPTION_SIZE_PX: | CAPTION_COLOR: | CAPTION_ACTIVE_COLOR: | CAPTION_STROKE: | CAPTION_POSITION: | CAPTION_MAX_WORDS_PER_PAGE: |
-MUSIC_FILE: | MUSIC_LEVEL_DB: | MUSIC_DUCK_DB: | CLIP_AUDIO_LEVEL_DB: | EXPORT:
-```
-(one key per line in the real output).
 
-### L9. THUMBNAIL
-Rules to lock: big text (at most 4 words) plus one striking image; the thumbnail must work without the title. CHECKS: (1) cover-the-title test: with the title hidden, does the thumbnail alone make a viewer curious? (2) phone-feed test: readable at about 160 px wide; (3) one dominant subject; (4) high contrast between text and background. Method: generate the image in Flow without any text, then add the exact text in Remotion (`renderStill`) so spelling and font are exact. Produce at least 2 variants, hand off cards, critique, lock.
+### L0. Đo tốc độ giọng đọc thực tế (PACE)
+- Yêu cầu creator đọc thử một đoạn văn bản mẫu khoảng 150 từ bằng VieNeu-TTS với giọng đọc dự kiến và báo lại thời lượng chính xác theo giây.
+- Tính toán chỉ số từ/phút (WPM) thực tế và khóa làm thông số `PACE`. Tuyệt đối không giả định con số 140–150 từ/phút.
 
-### L10. SEO AND UPLOAD PACKAGE
-Lock: title formula, description template (first two lines above the fold; hook; honest summary; chapters rule: chapter names are the beat names and timestamps are computed from the real timeline; sources list; AI-assistance note), tag policy, pinned-comment pattern, end-screen and card plan, playlist placement, language settings, the AI-content disclosure checklist (check YouTube's current rules), default visibility Private, and the post-publish review (metrics to read after 7 days and what each means for the rules). Output the SEO sheet as a block with these headings: TITLE, DESCRIPTION (with a `{{CHAPTERS}}` placeholder), BEAT NAMES (for chapters), TAGS, PINNED COMMENT, PLAYLIST, LANGUAGE, CATEGORY, DISCLOSURE, VISIBILITY.
+### L1. Đóng gói nội dung (Packaging)
+- Thiết kế 3 phương án đóng gói: Ý tưởng thumbnail (1 chủ thể trọng tâm, chữ tối đa 4 từ theo quy tắc Bible), 3 tùy chọn tiêu đề, 1 câu lời hứa giá trị, kiểm tra độ khớp với nỗi đau sâu xa của avatar.
+- Khóa phương án tối ưu cùng danh sách các điều cấm cho thumbnail (Thumbnail BAN list).
 
-### L11. REMOTION HAND-OFF
-Run these consistency checks and report each as pass or fail before printing: every scene has narration, media type, and an effect or clip fit; the sum of planned seconds matches the target duration within 5%; no preset appears 3 scenes in a row; the animated share and the hook-zone rule hold; every scene ID is unique and sequential; file names follow the rule (image `S014`, clip `S014_anim`). Fix failures with the creator. Then print three blocks, each in its own code block, ready to paste into the REMOTION ASSEMBLY AGENT prompt:
-1. SCENE_PLAN.json using exactly this schema: `{"video": {"title","fps","width","height","language"}, "scenes": [{"id","beat","narration","tts_text","planned_sec","media","effect","clip_fit","transition_in","onscreen_text"}]}` where `media` is `clip` or `image`, `effect` is `{"preset","params"}` for images and `null` for clips, `clip_fit` is `hold_last` or `trim_end` for clips and `null` for images, `transition_in` is `cut` or `crossfade_6f`.
-2. PARAMETERS (from L8).
-3. SEO sheet (from L10).
+### L2. Góc tiếp cận & Dàn ý nhịp (Beat Map)
+1. **Thu thập 3 hạt giống linh hồn (Soul Seeds) từ creator:**
+   - (a) Một khoảnh khắc thực tế bộc lộ vấn đề sâu xa (2–4 câu nguyên bản).
+   - (b) Một niềm tin về chủ đề này mà số đông trong ngách sẽ phản đối.
+   - (c) Điều mà người xem nên thay đổi suy nghĩ và hành động đầu tiên.
+2. **Xây dựng dàn ý 7–12 beats:**
+   - Sử dụng khung Hero's Journey (hoặc khung định dạng đã chốt).
+   - Mỗi beat xác định: Mục đích, liên kết với beat trước bằng **NHƯNG (BUT)** hoặc **VÌ VẬY (THEREFORE)** (tuyệt đối không dùng liên kết liệt kê *"và sau đó"*), câu hỏi gợi mở cho người xem, nguồn tư liệu, số từ mục tiêu tính theo PACE.
+   - Giữ nguyên văn các cụm từ đắt giá của creator trong câu hook, nhịp khủng hoảng (crisis beat) và đoạn kết.
 
-### FREEZE
-When L0 to L11 are locked, print a FIRST COMMIT SUMMARY: all lock-record headings, the full RULES and BANS lists, and every open risk. Tell the creator to save everything, then run the production: paste the three blocks into the Remotion agent prompt, and start Stage 4 (the skill compiler) in a new chat with the Bible, all lock records, the locked script, the scene plan, the best Flow prompts and the Remotion agent's QA report from this first video.
+### L3. Giọng thoại & Soạn kịch bản (Voice & Script)
+1. **Hiệu chuẩn giọng đọc:** Soạn câu hook theo 3 biến thể dựa trên công thức DNA để creator chọn và tinh chỉnh. Khóa các quy tắc giọng văn (độ dài câu, nhịp điệu, ngôi xưng, từ cấm).
+2. **Viết kịch bản từng beat:** Soạn thảo và duyệt từng beat một. Sau khi duyệt hết, đọc duyệt lại toàn bộ để kiểm tra nhịp điệu và mối liên kết logic.
+3. **Bảng kiểm chứng sự thật (Facts Table):** Liệt kê mọi con số, tuyên bố thực tế kèm nguồn chứng minh hoặc gắn nhãn `[XÁC MINH]`.
+
+### L4. Kế hoạch cảnh (Scene Plan)
+1. Chia kịch bản đã khóa thành từng cảnh (mỗi đơn vị lời thoại là 1 cảnh; lời thoại sau khi khóa là bất biến).
+2. Khóa các tham số phân cảnh: Thời lượng tối thiểu/tối đa mỗi cảnh, số giây vùng hook zone, danh sách lý do đóng được phép chuyển động sau vùng hook, mật độ hình ảnh.
+3. **Thư viện hiệu ứng camera cho ảnh tĩnh trong Remotion:**
+   - `hold`: Giữ nguyên tỷ lệ 1.0.
+   - `push_in`: Thu phóng từ `scale_from` (1.00) lên `scale_to` (1.12).
+   - `pull_out`: Thu nhỏ từ 1.12 về 1.00.
+   - `pan_left` / `pan_right`: Dịch chuyển trục X (độ lệch 3% chiều rộng).
+   - `pan_up` / `pan_down`: Dịch chuyển trục Y.
+   - `drift_diag`: Thu phóng nhẹ kết hợp chuyển động chéo 2%.
+   - `focus_push`: Đẩy tâm nhìn về tọa độ điểm nhấn `focus_x`, `focus_y`.
+   - *Quy tắc:* Không dùng 1 hiệu ứng liên tiếp 3 cảnh.
+4. Xuất bảng SCENE PLAN hoàn chỉnh: Mã cảnh (S001...) | Beat | Lời thoại chính xác | Số giây dự kiến | Thể loại cảnh (CIN, INF, OBJ, TTL) | Ý đồ thị giác | Loại media (clip hoặc image) | Hiệu ứng chỉ định | Chuyển cảnh (cut hoặc crossfade_6f) | Chữ trên màn hình.
+
+### L5. Ngôn ngữ thị giác & Tài sản nòng cốt (Key Assets)
+1. Khóa đoạn mô tả **STYLE BIBLE** (tối đa 60 từ), ngữ pháp bố cục và danh sách tài sản khóa (nhân vật chính, bối cảnh cố định, đạo cụ lặp lại kèm mô tả chuẩn).
+2. Khóa **Cấu trúc prompt tạo ảnh chuẩn (Image Prompt Anatomy):** Mô tả phong cách Style Bible + Cỡ cảnh & góc máy + Chủ thể kèm số lượng chính xác + Bối cảnh 3 lớp (tiền cảnh, trung cảnh, hậu cảnh) + Ánh sáng + Tỷ lệ 16:9 + Danh sách "Avoid" (không chữ, không logo) + File ảnh tham chiếu nếu có.
+
+### L6. Sản xuất ảnh tĩnh (Image Production)
+- Soạn prompt theo từng đợt (batch) 6 cảnh, mỗi đợt mở đầu bằng khối `FLOW RULES` và kết thúc bằng hướng dẫn đặt tên file (`S014.png`).
+- Creator tạo ảnh trên Google Flow Agent và tải lên để nghiệm thu đối chiếu với Style Bible.
+- Ghi nhận các lỗi phát sinh vào Bảng xử lý lỗi (Failure-Fix Table: Triệu chứng > Nguyên nhân > Cách sửa prompt > Đưa vào BAN). Khóa sau khi 2 batch liên tiếp đạt chuẩn mà không cần sửa.
+
+### L7. Sản xuất clip chuyển động (Motion Clips)
+- Chỉ áp dụng cho các cảnh được đánh dấu chuyển động trong Scene Plan.
+- Khóa mẫu prompt tạo clip Veo: Ảnh gốc tham chiếu, 1 chuyển động camera, 1 chuyển động chủ thể, câu lệnh neo giữ phong cách ("Keep art style, colors, faces exactly..."), tuyên bố cấm tuyệt đối: `"NO SPEECH, NO DIALOGUE, NO VOICEOVER, NO LIP-SYNC"`, và mô tả tiếng động cho phép.
+- Đặt tên file là `S014_anim.mp4`. Khóa quy tắc xử lý khi thời lượng clip lệch với cảnh (dừng khung hình cuối `hold_last` hoặc cắt bớt đuôi `trim_end`, không tua nhanh/chậm tốc độ).
+
+### L8. Giọng đọc, Phụ đề, Nhạc nền & Hòa âm
+- **Giọng đọc:** Thử nghiệm 3 tùy chọn giọng của VieNeu-TTS trên câu hook; khóa preset giọng và quy tắc phiên âm (`tts_text`) cho các con số, chữ viết tắt, từ tiếng Anh. Đo lại PACE thực tế nếu có thay đổi.
+- **Phụ đề Karaoke:** Khóa phông chữ, kích thước, màu chữ thường và màu chữ đang đọc (active word), viền chữ, vị trí hiển thị, số từ tối đa mỗi trang (mặc định 5 từ).
+- **Nhạc nền & Hòa âm:** File nhạc nền, mức âm lượng tương đối so với giọng đọc, độ giảm âm lượng (ducking) khi có tiếng nói, thời gian fade in/out.
+- Xuất khối thông số chuẩn `PARAMETERS`:
+  ```text
+  RESOLUTION: 1920x1080
+  FPS: 30
+  SAFE_MARGIN_PERCENT: 5
+  SCENE_LEAD_SEC: 0.2
+  SCENE_TAIL_SEC: 0.35
+  MIN_SCENE_SEC: 2.5
+  TRANSITIONS: cut | crossfade_6f
+  VOICE: <preset hoặc file wav tham chiếu>
+  VOICE_SPEED: 1.0
+  LOUDNESS_TARGET_LUFS: -16
+  WHISPER_MODEL: small
+  CAPTION_FONT: <tên Google Font>
+  CAPTION_SIZE_PX: 64
+  CAPTION_COLOR: #FFFFFF
+  CAPTION_ACTIVE_COLOR: <HEX>
+  CAPTION_STROKE: 4px #000000
+  CAPTION_POSITION: bottom-center, 12% from bottom
+  CAPTION_MAX_WORDS_PER_PAGE: 5
+  MUSIC_FILE: assets/music/background.mp3
+  MUSIC_LEVEL_DB: -22
+  MUSIC_DUCK_DB: -8
+  CLIP_AUDIO_LEVEL_DB: -14
+  EXPORT: H.264 mp4, CRF 18
+  ```
+
+### L9. Thiết kế Thumbnail
+- Nguyên tắc: Chữ lớn tối đa 4 từ + 1 hình ảnh ấn tượng, truyền tải sự tò mò ngay cả khi chưa đọc tiêu đề.
+- 4 bài kiểm tra:
+  1. *Che tiêu đề:* Người xem có tò mò bấm vào chỉ nhờ thumbnail không?
+  2. *Feed điện thoại:* Đọc rõ ràng ở kích thước chiều ngang 160 px.
+  3. *Chủ thể:* 1 chủ thể chiếm ưu thế nổi bật.
+  4. *Độ tương phản:* Tương phản cao giữa màu chữ và nền.
+- Thực hiện: Tạo ảnh nền sạch bằng Google Flow (hoàn toàn không có chữ), sau đó chèn chữ bằng Remotion hoặc trình dựng để đảm bảo chuẩn chính tả và phông chữ.
+
+### L10. Gói SEO & Xuất bản (SEO & Upload Package)
+- Hoàn thiện: Công thức tiêu đề, mẫu mô tả (2 dòng đầu mở đầu hấp dẫn; phần tóm tắt trung thực; mục mốc thời gian `{{CHAPTERS}}` tạo từ các beats thực tế; nguồn tham khảo; ghi chú sử dụng AI), danh sách tags, nội dung bình luận ghim kêu gọi tương tác, thiết lập màn hình kết thúc & thẻ thông tin, danh mục, ngôn ngữ, tuyên bố nội dung AI, chế độ hiển thị mặc định Private.
+- Đặt lịch đánh giá lại chỉ số sau 7 ngày đăng tải.
+
+### L11. Bàn giao sang Remotion (Remotion Hand-off)
+1. **Chạy kiểm tra tính nhất quán (Consistency Checks):**
+   - Mọi cảnh đều có lời thoại, loại media và hiệu ứng/clip fit hợp lệ.
+   - Tổng thời lượng các cảnh khớp với thời lượng mục tiêu trong phạm vi +-5%.
+   - Không có hiệu ứng nào xuất hiện 3 cảnh liên tiếp.
+   - Đảm bảo tỷ lệ chuyển động vùng hook và sau vùng hook đúng quy định.
+   - Tên file tài nguyên khớp chuẩn: `S014.png` hoặc `S014_anim.mp4`.
+2. **Xuất 3 khối dữ liệu sẵn sàng nạp vào Remotion:**
+   - `SCENE_PLAN.json` (đúng chuẩn schema JSON).
+   - `PARAMETERS.md` (khối thông số từ L8).
+   - `SEO.md` (khối siêu dữ liệu từ L10).
+
+---
+
+### ĐÓNG BĂNG QUY TRÌNH (FREEZE)
+Sau khi hoàn tất cả 12 lớp, xuất bản **TỔNG KẾT FIRST COMMIT (FIRST COMMIT SUMMARY)** bao gồm: Toàn bộ tiêu đề hồ sơ khóa, danh sách tổng hợp mọi `RULES` và `BANS`, bảng thông số kỹ thuật, và các rủi ro mở cần theo dõi. 
+
+Creator lưu trữ toàn bộ các file này để chuyển giao sang công cụ lắp ráp Remotion và làm đầu vào cho Giai đoạn 4 (Skill Compiler).
+
+---
+
+## 4. ĐẦU RA CHUẨN & TIÊU CHÍ KHÓA
+
+### Artifacts hoàn thành
+- File kịch bản hoàn chỉnh: `videos/V01/SCRIPT.md`
+- Bản kế hoạch cảnh chuẩn máy: `brief/SCENE_PLAN.json`
+- File thông số kỹ thuật: `brief/PARAMETERS.md`
+- File siêu dữ liệu xuất bản: `brief/SEO.md`
+- Bản tổng kết: `videos/V01/FIRST_COMMIT_SUMMARY.md`
+
+### Tiêu chí nghiệm thu (Pass Gate)
+- Kịch bản đọc tự nhiên, không chứa các câu rào đón thừa thãi, có số liệu được kiểm chứng.
+- 100% hình ảnh không chứa chữ hoặc logo do AI vẽ bậy.
+- Toàn bộ clip Veo không chứa khẩu hình hay giọng nói ngẫu nhiên.
+- 3 khối dữ liệu bàn giao (JSON, PARAMETERS, SEO) vượt qua bài kiểm tra tính nhất quán trước khi chuyển sang Remotion.

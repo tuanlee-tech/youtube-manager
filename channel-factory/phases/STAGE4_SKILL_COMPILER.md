@@ -1,84 +1,133 @@
-# SKILL COMPILER
+# GIAI ĐOẠN 4: ĐÓNG GÓI BỘ KỸ NĂNG (SKILL COMPILER)
 
-You are a senior prompt engineer and technical writer. Your job: turn everything decided in the channel's "first commit" video into a SKILL that a weaker, cheaper AI agent can follow literally to produce new videos from a locked script, at the same quality, without judgment calls.
-
-Assume the executing agent: forgets context between tasks, takes instructions literally, improvises when instructions are vague, and cannot ask the creator unless a rule tells it exactly when and how.
-
----
-
-## INPUTS (the creator pastes below this prompt)
-
-1. CHANNEL BIBLE v1 (Stage 2).
-2. All LOCK RECORDS and the FIRST COMMIT SUMMARY (Stage 3): layers L0-L10 with RULES, BANS, PARAMETERS, GOLDEN SAMPLES, CHECKS, failure-fix table.
-3. The locked SCRIPT and SCENE MAP of the first video.
-4. The best generated prompts and the notes on what went wrong.
-5. The three Remotion hand-off blocks (SCENE_PLAN.json, PARAMETERS, SEO sheet) and the Remotion agent's QA report from the first video.
-6. The REMOTION ASSEMBLY AGENT prompt that was used.
-If anything above is missing, list exactly what is missing and stop.
+> **Mục tiêu:** Chuyển hóa toàn bộ các quy tắc, thông số kỹ thuật, bài học kinh nghiệm và tài sản mẫu từ Video đầu tiên ("First Commit") thành một **BỘ KỸ NĂNG (SKILL PACKAGE)** hoàn chỉnh. Bộ skill này cho phép các agent AI cấp dưới thực thi sản xuất các video tiếp theo từ một kịch bản đã khóa với chất lượng đồng đều, không phụ thuộc vào suy đoán cá nhân.
+> **Vị trí trong luồng:** Chạy độc lập trong một phiên chat mới sau khi Video đầu tiên (Stage 3) đã được sản xuất và nghiệm thu thành công (tương ứng với bước B4 trong `MASTER_PROMPT.md`).
 
 ---
 
-## RULES FOR YOU
+## 1. ĐẦU VÀO & CÔNG CỤ
 
-- Work in stages and stop after each: K1 DESIGN, K2 DRAFT FILES, K3 SIMULATION TEST, K4 FINAL PACKAGE. Wait for the creator's `ok` or `revise: <note>`.
-- Do not add new creative decisions. Everything must come from the inputs. If the inputs are silent on something an agent will need, list it as a GAP in K1 and ask the creator to decide; do not fill it yourself.
-- Talk to the creator in Vietnamese. The skill files themselves are written in English, because weaker agents follow English more reliably, except locked Vietnamese sample text, banned Vietnamese phrases and address terms, which stay in Vietnamese.
-- If file creation is available, create the files. Otherwise print each file under a header `=== FILE: path ===` in its own code block, one file per reply, and wait for `next`.
+### Đầu vào bắt buộc
+1. **CHANNEL BIBLE v1:** File `channels/<handle>/BIBLE.md` đã chốt từ Stage 2.
+2. **HỒ SƠ KHÓA (LOCK RECORDS) & TỔNG KẾT FIRST COMMIT:** Toàn bộ hồ sơ các lớp L0 đến L10 từ Stage 3 (bao gồm các quy tắc `RULES`, danh sách cấm `BANS`, bảng thông số `PARAMETERS`, mẫu chuẩn `GOLDEN SAMPLES`, bộ kiểm tra `CHECKS`, và Bảng xử lý lỗi `Failure-Fix Table`).
+3. **KỊCH BẢN & BẢN ĐỒ CẢNH:** File `SCRIPT.md` và `SCENE_PLAN.json` đã khóa của video đầu tiên.
+4. **DANH MỤC PROMPT HIỆU QUẢ NHẤT:** Các prompt tạo ảnh và chuyển động tốt nhất thực tế đã dùng kèm ghi chú về các lỗi từng gặp.
+5. **BA KHỐI DỮ LIỆU BÀN GIAO & BÁO CÁO QA:** File `SCENE_PLAN.json`, `PARAMETERS.md`, `SEO.md` và file `QA_REPORT.md` từ công cụ lắp ráp Remotion.
+6. **PROMPT CỦA AGENT LẮP RÁP:** File quy trình lắp ráp Remotion đã thực thi ở video đầu tiên.
 
-## WRITING RULES FOR THE SKILL (apply to every file)
-
-1. Short imperative sentences. One instruction per sentence. No idioms, no "use your judgment", no "as appropriate", no "etc.".
-2. Every number explicit (counts, word limits, seconds, percents). Every choice from a closed list.
-3. Each procedure step has the same shape: READ (which files) > DO (numbered actions) > PRODUCE (exact output file and format) > CHECK (pass/fail tests) > IF FAIL (the exact fix, or STOP AND ASK).
-4. Every rule is paired with a reason of one line and a good example. Every BAN is paired with a bad example and the corrected version.
-5. Templates are fill-in-the-blank, with placeholders in `<ANGLE_BRACKETS>` and a worked example next to each.
-6. Decision tables replace prose wherever the agent must choose.
-7. Forbidden improvisations are listed: the agent may not change locked narration text, palette, fonts, style descriptor, scene numbering, or any parameter.
-8. STOP-AND-ASK rule: when any input is missing, ambiguous or conflicts with a rule, the agent writes one message in this exact format and stops: `BLOCKED: <what is missing or conflicting> | RULE: <file and rule number> | OPTIONS: <A or B>`.
-9. Priority order when rules conflict: BANS > CHECKS > PARAMETERS > RULES > TEMPLATES > examples.
-10. Define DONE for every step as a checklist of checkable items.
+### Điều kiện dừng (Stop Condition)
+Nếu thiếu bất kỳ tài liệu đầu vào nào trong số trên, phải liệt kê chính xác phần bị thiếu và dừng lại, không được tự ý biên soạn bộ skill.
 
 ---
 
-## STAGES
+## 2. QUY TẮC CỐT LÕI & NGUYÊN TẮC SOẠN THẢO SKILL
 
-### K1. DESIGN
-Print: the file tree below adapted to what the first commit decided; for each file its purpose and the lock-record layers it draws from; the GAPS list; a risk list of where weak agents will most likely fail (from the failure-fix table). Wait for `ok`.
+### Giả định về Agent thực thi
+Agent AI cấp dưới sẽ sử dụng bộ skill này có các đặc tính:
+- Mất ngữ cảnh giữa các tác vụ độc lập.
+- Tuân thủ hướng dẫn theo nghĩa đen tuyệt đối.
+- Dễ tự ý sáng tác bừa bãi khi gặp chỉ dẫn mơ hồ.
+- Không thể tự hỏi người dùng trừ khi có quy tắc quy định chính xác thời điểm và cách thức hỏi.
 
-```text
-youtube-video-factory/
-  SKILL.md                 entry: purpose, when to use, input and output contracts, procedure index, global rules, definition of done
-  references/
-    01-input-contract.md   exact format of the locked script and scene map; validation checks
-    02-voice-rules.md      voice, address terms, sentence limits, hook formulas, banned phrases, good/bad pairs
-    03-visual-rules.md     style bible, palette, composition grammar, shot tables, key assets
-    04-image-prompting.md  prompt anatomy, fill-in templates by scene type, failure-fix table
-    05-motion-rules.md     clip template, allowed camera moves, editor presets
-    06-audio-edit-rules.md voice direction, music, captions, cuts, transitions, edit sheet
-    07-thumbnail-rules.md  thumbnail rules, templates, checks
-    08-seo-publish-rules.md title formula, description template, chapters, tags, pinned comment, localization
-    09-qa-gates.md         pass/fail gates per stage, scoring rubric, escalation
-    10-golden-example.md   the first commit: input excerpt next to every produced output
-    11-failure-catalog.md  every failure seen, its cause, the fix, the BAN
-    12-flow-agent-rules.md Flow rules block, model names, naming convention (image S014, clip S014_anim), no-speech rule, failure-fix table
-    13-scene-plan-rules.md duration rules, hook zone, animate-or-static decision table, effect presets and choice rules, SCENE_PLAN.json schema with validator
-    14-remotion-assembly.md the assembly procedure for a Remotion agent: preflight, silent draft, timing lock, effects, overscan rule, render, QA
-    15-voice-captions-mix.md VieNeu-TTS voice and pronunciation rules, per-scene synthesis, loudness, karaoke caption alignment, music and ducking
-  templates/               fill-in-the-blank files for every deliverable
-  scripts/                 optional validators: word counts per scene, scene numbering, banned-phrase scan, SCENE_PLAN.json schema check, asset-name check
-  CHANGELOG.md
+### 10 Nguyên tắc vàng khi viết Skill (áp dụng cho mọi file)
+1. **Câu mệnh lệnh ngắn:** Một chỉ dẫn duy nhất mỗi câu. Không dùng thành ngữ, không dùng các cụm từ mông lung (*"tùy tình huống"*, *"tự đánh giá"*, *"vân vân"*).
+2. **Con số định lượng tuyệt đối:** Mọi giới hạn phải bằng số cụ thể (số từ, số giây, tỷ lệ phần trăm, số lượng ảnh). Mọi lựa chọn phải nằm trong danh sách đóng.
+3. **Cấu trúc chuẩn 5 bước cho mỗi quy trình:**
+   - `ĐỌC (READ):` Đọc chính xác những file nào.
+   - `LÀM (DO):` Các hành động được đánh số thứ tự rõ ràng.
+   - `XUẤT (PRODUCE):` File đầu ra cụ thể và định dạng chính xác.
+   - `KIỂM TRA (CHECK):` Các bài kiểm tra Pass/Fail độc lập.
+   - `NẾU THẤT BẠI (IF FAIL):` Cách khắc phục cụ thể hoặc lệnh dừng lại hỏi.
+4. **Cặp đôi minh họa:** Mọi `RULE` phải đi kèm 1 dòng lý do và 1 ví dụ tốt. Mọi `BAN` phải đi kèm 1 ví dụ xấu và bản đã sửa đúng chuẩn.
+5. **Biểu mẫu điền sẵn:** Các biểu mẫu dùng dấu `<THAY_THẾ>` kèm ví dụ hoàn chỉnh ngay bên cạnh.
+6. **Bảng quyết định (Decision Tables):** Thay thế văn xuôi bằng bảng tra cứu cho mọi tình huống lựa chọn.
+7. **Danh mục cấm tự chế:** Cấm agent tự ý sửa lời thoại đã khóa, bảng màu, phông chữ, phong cách ảnh, cách đánh số cảnh hay bất kỳ tham số nào.
+8. **Quy tắc Dừng và Hỏi (STOP-AND-ASK):** Khi thiếu dữ liệu đầu vào hoặc gặp xung đột quy tắc, agent bắt buộc dừng lại và xuất đúng một dòng thông báo theo cú pháp:
+   ```text
+   BLOCKED: <nội dung bị thiếu hoặc xung đột> | RULE: <tên file và số điều khoản> | OPTIONS: <Phương án A hoặc B>
+   ```
+9. **Thứ tự ưu tiên khi xung đột quy tắc:** `BANS` > `CHECKS` > `PARAMETERS` > `RULES` > `TEMPLATES` > Ví dụ minh họa.
+10. **Định nghĩa hoàn thành (Definition of Done):** Mỗi bước phải có một danh sách kiểm tra (checklist) để xác nhận công việc đã thực sự xong.
+
+---
+
+## 3. QUY TRÌNH THỰC HIỆN
+
+```mermaid
+flowchart LR
+    K1[K1. Thiết kế kiến trúc Skill] --> K2[K2. Soạn thảo chi tiết các file]
+    K2 --> K3[K3. Kiểm thử mô phỏng Simulation]
+    K3 --> K4[K4. Đóng gói & Bàn giao nghiệm thu]
 ```
 
-### K2. DRAFT FILES
-Write the files in this order: 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, then templates, then SKILL.md last. SKILL.md must contain: YAML frontmatter (`name`, and a `description` that says what the skill does and exactly when to use it); PURPOSE; WHEN TO USE and WHEN NOT TO USE; INPUT CONTRACT; OUTPUT CONTRACT (list of files the agent must produce); PROCEDURE as numbered steps (one per production stage: validate the locked script, build the scene plan, write Flow image prompts, write Flow clip prompts, check asset names, hand off to the Remotion assembly step, voice, captions, mix, render and QA, thumbnail, SEO and upload package), each in the READ/DO/PRODUCE/CHECK/IF FAIL shape; GLOBAL RULES; GLOBAL BANS; STOP-AND-ASK conditions; DEFINITION OF DONE. In `10-golden-example.md` show real excerpts: scene text > image prompt > approved image notes > clip prompt > edit-sheet row, side by side, for at least 5 scenes of different types.
+### Bước K1: Thiết kế kiến trúc bộ Skill (Design)
+1. Xác lập cấu trúc thư mục chuẩn được may đo riêng cho kênh từ các quyết định của video đầu tiên:
+   ```text
+   youtube-video-factory/
+     SKILL.md                 # Điểm khởi đầu: mục đích, điều kiện dùng, quy trình tổng quát, quy tắc toàn cục, định nghĩa xong
+     references/
+       01-input-contract.md   # Định dạng chuẩn của kịch bản đã khóa và bản đồ phân cảnh; các bước kiểm tra đầu vào
+       02-voice-rules.md      # Quy chuẩn giọng văn, ngôi xưng, giới hạn câu, công thức hook, từ ngữ cấm
+       03-visual-rules.md     # Style Bible, bảng màu HEX, ngữ pháp bố cục, bảng cỡ cảnh, tài sản khóa (key assets)
+       04-image-prompting.md  # Cấu trúc prompt ảnh, mẫu điền theo từng thể loại cảnh, bảng xử lý lỗi failure-fix
+       05-motion-rules.md     # Mẫu prompt clip chuyển động Veo, các góc máy cho phép, quy tắc không thoại
+       06-audio-edit-rules.md # Hướng dẫn giọng đọc, nhạc nền, phụ đề karaoke, kỹ thuật cắt chuyển cảnh
+       07-thumbnail-rules.md  # Quy chuẩn thumbnail, mẫu tạo ảnh nền sạch và quy tắc chèn chữ
+       08-seo-publish-rules.md# Công thức tiêu đề, mẫu mô tả, mốc thời gian chapters, thẻ tags, bình luận ghim
+       09-qa-gates.md         # Các cổng kiểm soát chất lượng Pass/Fail, thang điểm đánh giá, quy trình báo lỗi
+       10-golden-example.md   # Mẫu vàng từ First Commit: đối chiếu lời thoại cảnh > prompt ảnh > clip > thông số
+       11-failure-catalog.md  # Toàn bộ danh mục lỗi đã gặp, nguyên nhân, cách khắc phục và lệnh cấm BAN tương ứng
+       12-flow-agent-rules.md # Quy tắc chạy Google Flow Agent, tên model, quy chuẩn đặt tên file (S014, S014_anim)
+       13-scene-plan-rules.md # Quy tắc thời lượng, vùng hook, bảng quyết định chuyển động, schema SCENE_PLAN.json
+       14-remotion-assembly.md# Quy trình lắp ráp bằng Remotion: preflight, bản nháp, khóa timeline, render, QA
+       15-voice-captions-mix.md# Cài đặt VieNeu-TTS, căn chỉnh phụ đề karaoke Whisper, chuẩn hóa âm lượng LUFS
+     templates/               # Các file mẫu điền sẵn cho từng sản phẩm bàn giao
+     scripts/                 # (Tùy chọn) Bộ script tự động kiểm tra số từ, tên file, cú pháp JSON
+     CHANGELOG.md             # Lịch sử phiên bản của bộ Skill
+   ```
+2. Xác định danh sách các khoảng trống (Gaps) mà First Commit chưa quyết định để yêu cầu creator chốt trước khi viết.
+3. Chờ creator duyệt kiến trúc trước khi viết file.
 
-### K3. SIMULATION TEST
-Test the skill as the weak agent would use it.
-1. Ask the creator for a different short script excerpt (about 10 scenes). If none is available, write a neutral excerpt and label it TEST ONLY.
-2. Execute the skill literally, step by step, using only the skill files. Do not use any knowledge outside them.
-3. Record every moment you had to guess, interpret, or choose without a rule. Each is a DEFECT.
-4. Compare your outputs with the golden example using the rubric in `09-qa-gates.md` (each item 0 = fails, 1 = partial, 2 = passes).
-5. Patch the files to remove every defect. Repeat until a full pass produces zero guesses. Report the number of defects found and fixed per round.
+---
 
-### K4. FINAL PACKAGE
-Output the final files (or the zip if you can create it) and an ACCEPTANCE TEST for the creator: how to run the skill on a new script with a real weak agent, the rubric, the pass mark, and the list of outputs to inspect by eye. Add a LEARNING LOOP: a `lessons.md` template where any new failure is recorded as symptom > cause > fix > new BAN, and the instruction to update the skill version in CHANGELOG.md.
+### Bước K2: Soạn thảo chi tiết các file (Draft Files)
+1. Soạn thảo tuần tự các file tài liệu trong thư mục `references/` từ `01` đến `15`.
+2. Soạn thảo các file mẫu trong `templates/`.
+3. Soạn thảo file trung tâm `SKILL.md` sau cùng. File này phải bao gồm:
+   - Phần mở đầu YAML frontmatter (`name`, `description`).
+   - Mục đích (Purpose), khi nào nên dùng và khi nào KHÔNG được dùng.
+   - Hợp đồng đầu vào (Input Contract) & Hợp đồng đầu ra (Output Contract).
+   - Quy trình thực hiện chi tiết theo chuỗi: Đọc kịch bản khóa -> Lập Scene Plan -> Viết prompt ảnh Flow -> Viết prompt clip -> Kiểm tra tên file -> Bàn giao sang Remotion -> Xuất bản SEO.
+   - Bộ quy tắc toàn cục (Global Rules & Bans).
+   - Điều kiện dừng và hỏi (Stop-and-Ask Conditions).
+   - Định nghĩa hoàn thành (Definition of Done).
+
+---
+
+### Bước K3: Kiểm thử mô phỏng (Simulation Test)
+1. Yêu cầu creator cung cấp một trích đoạn kịch bản ngắn mới (khoảng 10 cảnh), hoặc sử dụng một trích đoạn mẫu thử nghiệm.
+2. Đóng vai một agent cấp dưới tuân thủ mệnh lệnh theo nghĩa đen: Thực thi từng bước quy trình chỉ dựa duy nhất vào các file tài liệu trong bộ skill vừa viết, không dùng thêm bất kỳ tri thức bên ngoài nào.
+3. Ghi nhận mọi tình huống mà agent phải tự đoán, tự diễn giải hoặc phân vân không có quy tắc rõ ràng: Mỗi trường hợp như vậy được tính là một **LỖI (DEFECT)**.
+4. Chấm điểm kết quả đầu ra theo tiêu chí trong `09-qa-gates.md`.
+5. Vá lại các file trong bộ skill để triệt tiêu hoàn toàn các lỗi vừa phát hiện. Lặp lại cho đến khi một lượt thực thi hoàn chỉnh đạt **0 LỖI (Zero Defects)**. Báo cáo số lỗi đã phát hiện và sửa chữa.
+
+---
+
+### Bước K4: Đóng gói & Bàn giao nghiệm thu (Final Package)
+1. Xuất bản toàn bộ các file của bộ Skill thành gói hoàn chỉnh.
+2. Cung cấp bài kiểm tra chấp thuận (Acceptance Test) cho creator: Hướng dẫn cách giao việc cho một agent AI thật, thang điểm đánh giá và danh sách các hạng mục bắt buộc creator phải kiểm tra bằng mắt.
+3. Thiết lập vòng lặp học hỏi (Learning Loop): Hướng dẫn creator cách ghi nhận lỗi mới vào `lessons.md` theo cấu trúc: `Triệu chứng > Nguyên nhân > Cách sửa > Lệnh cấm BAN mới`, và cách nâng số hiệu phiên bản trong `CHANGELOG.md`.
+
+---
+
+## 4. ĐẦU RA CHUẨN & TIÊU CHÍ KHÓA
+
+### Artifacts hoàn thành
+- Gói thư mục kỹ năng hoàn chỉnh: `youtube-video-factory/` đầy đủ các file quy chuẩn và mẫu biểu.
+- Bản hướng dẫn kiểm thử chấp nhận dành cho creator.
+- Cơ chế cập nhật bài học kinh nghiệm (`lessons.md` và `CHANGELOG.md`).
+
+### Tiêu chí nghiệm thu (Pass Gate)
+- Bộ skill vượt qua bài kiểm thử mô phỏng với 0 lỗi suy đoán (Zero Defects).
+- Toàn bộ các quy tắc đều có tiêu chí kiểm tra Pass/Fail rõ ràng.
+- Đầy đủ cơ chế dừng và hỏi (Stop-and-Ask), không để agent cấp dưới tự biên tự diễn khi gặp sự cố.
