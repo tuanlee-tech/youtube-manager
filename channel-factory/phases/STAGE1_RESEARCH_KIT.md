@@ -1,4 +1,7 @@
-# STAGE 1. NOTEBOOKLM + GEMINI: THU THẬP VÀ PHÂN TÍCH ĐỐI THỦ
+# STAGE 1. NOTEBOOKLM + GEMINI: THU THẬP VÀ PHÂN TÍCH ĐỐI THỦ (RESEARCH KIT)
+
+> Dùng sau bước R0 của MASTER_PROMPT: lấy khối CHANNEL IDEA do master prompt viết rồi chạy R1-R5 ở đây. Dán lại HAND-OFF HEADER + Part A, B, C vào chat master ở bước R2.
+
 
 Mục tiêu: tạo ra một bản viết **COMPETITOR INTELLIGENCE REPORT** đủ bằng chứng để Claude (Stage 2) dùng làm nền cho chiến lược kênh. Giai đoạn này chưa quyết định gì về kênh.
 
@@ -22,7 +25,7 @@ Tạo notebook mới. Thêm 8-15 video YouTube đối thủ (kênh nhỏ có vie
 
 ## R2. Source Audit (NotebookLM chat)
 
-Điền `CHANNEL IDEA` bằng 3-5 dòng: ngách, tệp khán giả, ngôn ngữ (Việt bắt buộc, kèm ngôn ngữ khác nếu có), vấn đề sâu xa bạn muốn chạm tới.
+Điền `CHANNEL IDEA` bằng 3-5 dòng: ngách, tệp khán giả, các giai đoạn hành trình người xem (nếu mỗi giai đoạn có tệp khác nhau thì mỗi giai đoạn một notebook riêng, vì bằng chứng giai đoạn đầu không suy ra được giai đoạn sau), ngôn ngữ (Việt bắt buộc, kèm ngôn ngữ khác nếu có), vấn đề sâu xa bạn muốn chạm tới.
 
 ```text
 CHANNEL IDEA: <niche; audience; languages: Vietnamese + ...; deeper problem>
